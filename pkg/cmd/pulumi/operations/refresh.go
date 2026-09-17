@@ -56,6 +56,7 @@ func NewRefreshCmd() *cobra.Command {
 	var debug bool
 	var expectNop bool
 	var message string
+	var coherenceWindow string
 	var execKind string
 	var execAgent string
 	var stackName string
@@ -361,6 +362,7 @@ func NewRefreshCmd() *cobra.Command {
 				SecretsManager:     sm,
 				SecretsProvider:    secrets.DefaultProvider,
 				Scopes:             backend.CancellationScopes,
+				CoherenceWindow:    coherenceWindow,
 			})
 
 			switch {
@@ -517,6 +519,9 @@ func NewRefreshCmd() *cobra.Command {
 	}
 
 	// internal flags
+	cmd.PersistentFlags().StringVar(&coherenceWindow, "coherence-window", "", "")
+	// ignore err, only happens if flag does not exist
+	_ = cmd.PersistentFlags().MarkHidden("coherence-window")
 	cmd.PersistentFlags().StringVar(&execKind, "exec-kind", "", "")
 	// ignore err, only happens if flag does not exist
 	_ = cmd.PersistentFlags().MarkHidden("exec-kind")

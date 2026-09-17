@@ -58,6 +58,7 @@ func NewDestroyCmd() *cobra.Command {
 	var stackName string
 
 	var message string
+	var coherenceWindow string
 	var execKind string
 	var execAgent string
 	var configArray []string
@@ -371,6 +372,7 @@ func NewDestroyCmd() *cobra.Command {
 				SecretsManager:     sm,
 				SecretsProvider:    secrets.DefaultProvider,
 				Scopes:             backend.CancellationScopes,
+				CoherenceWindow:    coherenceWindow,
 			})
 
 			out := cmd.OutOrStdout()
@@ -554,6 +556,9 @@ func NewDestroyCmd() *cobra.Command {
 	}
 
 	// internal flags
+	cmd.PersistentFlags().StringVar(&coherenceWindow, "coherence-window", "", "")
+	// ignore err, only happens if flag does not exist
+	_ = cmd.PersistentFlags().MarkHidden("coherence-window")
 	cmd.PersistentFlags().StringVar(&execKind, "exec-kind", "", "")
 	// ignore err, only happens if flag does not exist
 	_ = cmd.PersistentFlags().MarkHidden("exec-kind")

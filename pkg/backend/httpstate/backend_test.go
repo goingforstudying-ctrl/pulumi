@@ -3504,4 +3504,23 @@ func TestGetSnapshotStackOutputs(t *testing.T) {
 		require.NoError(t, err)
 		assert.Equal(t, wantOutputs, outputs)
 	})
+
+	t.Run("reads during an update name the reading update", func(t *testing.T) {
+		t.Parallel()
+		var gotQuery string
+		b, ref := newBackend(t, apitype.Capabilities{StackOutputs: true}, func(w http.ResponseWriter, r *http.Request) {
+			gotQuery = r.URL.RawQuery
+			require.NoError(t, json.NewEncoder(w).Encode(apitype.StackOutputsResponse{
+				Outputs:          serializedOutputs,
+				SecretsProviders: &apitype.SecretsProvidersV1{Type: b64.Type},
+			}))
+		})
+		updateID := "d333a711-4aa0-402f-be6d-72af9665fc37"
+		b.readingUpdateID.Store(&updateID)
+
+		outputs, err := b.getSnapshotStackOutputs(t.Context(), secretsProvider, ref)
+		require.NoError(t, err)
+		assert.Equal(t, wantOutputs, outputs)
+		assert.Equal(t, "readingUpdateID="+updateID, gotQuery)
+	})
 }
